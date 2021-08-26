@@ -47,3 +47,5 @@ public MyGrain(GrainLifecycleTelemetryLogger grainLifecycleTelemetryLogger)
 ```csharp
 services.AddSiloLifecycleTelemetryLogger();
 ```
+
+The following properties are added to the event telemetry: siloName, siloAddress and clusterId.
