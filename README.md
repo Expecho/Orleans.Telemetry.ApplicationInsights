@@ -5,6 +5,7 @@ Send grain telemetry to [Azure Application Insights](https://docs.microsoft.com/
 ## Supported telemetry:
 
 - Changes in grain lifecycle like (de)activations are logged as custom events.
+- Changes in sile lifecycle are logged as custom events.
 - Track incoming and/or outgoing grains calls as dependency telemetry.
 
 Telemetry outputted due to grain activity is enriched with the following custom properties:
@@ -26,10 +27,7 @@ siloBuilder.AddIncomingGrainCallFilter<OutgoingCallTelemetryLogger>();
 ### Tracking grain lifecycle events
 
 ```csharp
-services.AddTransient(
-    sp => GrainActivationTelemetryLogger.Create(
-        sp.GetRequiredService<IGrainActivationContext>(), 
-        sp.GetRequiredService<TelemetryClient>()));
+services.AddGrainLifecycleTelemetryLogger();
 ```
 
 Inject a GrainActivationTelemetryLogger in the grain to have it paticipate in the lifecycle tracking:
@@ -38,4 +36,10 @@ Inject a GrainActivationTelemetryLogger in the grain to have it paticipate in th
 public MyGrain(GrainActivationTelemetryLogger grainActivationTelemetryLogger)
 {
 }
+```
+
+### Tracking siloe lifecycle events
+
+```csharp
+services.AddSiloLifecycleTelemetryLogger();
 ```

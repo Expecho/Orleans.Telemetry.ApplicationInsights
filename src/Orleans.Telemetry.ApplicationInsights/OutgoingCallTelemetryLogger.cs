@@ -5,7 +5,7 @@ using Orleans.Runtime;
 
 namespace Orleans.Telemetry.ApplicationInsights
 {
-    public class OutgoingCallTelemetryLogger : IIncomingGrainCallFilter
+    public class OutgoingCallTelemetryLogger : IOutgoingGrainCallFilter
     {
         private readonly TelemetryClient _telemetryClient;
         private readonly ILocalSiloDetails _localSiloDetails;
@@ -18,22 +18,22 @@ namespace Orleans.Telemetry.ApplicationInsights
             _grainTypeContainer = grainTypeContainer;
         }
 
-        public async Task Invoke(IIncomingGrainCallContext context)
+        public async Task Invoke(IOutgoingGrainCallContext context)
         {
-            if (!_grainTypeContainer.ContainsGrain(context.ImplementationMethod.DeclaringType))
+            if (!_grainTypeContainer.ContainsGrain(context.InterfaceMethod.DeclaringType))
             {
                 await context.Invoke();
                 return;
             }
 
-            using (var operation = _telemetryClient.StartOperation<DependencyTelemetry>($"{context.ImplementationMethod.DeclaringType?.FullName}.{context.ImplementationMethod.Name}"))
+            using (var operation = _telemetryClient.StartOperation<DependencyTelemetry>($"{context.InterfaceMethod.DeclaringType?.FullName}.{context.InterfaceMethod.Name}"))
             {
                 var grainId = context.Grain.GetGraindId();
                 operation.Telemetry.Success = true;
                 operation.Telemetry.Type = "Orleans Actor MessageOut";
                 operation.Telemetry.Target = $"{_localSiloDetails.ClusterId}.{_localSiloDetails.SiloAddress}.{grainId}";
                 operation.Telemetry.Properties["grainId"] = grainId.ToString();
-                operation.Telemetry.Properties["grainType"] = context.ImplementationMethod.DeclaringType?.FullName;
+                operation.Telemetry.Properties["grainType"] = context.InterfaceMethod.DeclaringType?.FullName;
 
                 if (context.Arguments != null)
                     operation.Telemetry.Data = string.Join(", ", context.Arguments);
