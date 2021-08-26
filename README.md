@@ -2,6 +2,10 @@
 
 Send grain telemetry to [Azure Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview). Orleans is already able to log metrics and traces to Application Insights but it does not support writing Application Insights specific telemetry types like custom events and dependendencies out-of-the-box. 
 
+Related packages:
+- Metrics publisher: [Microsoft.Orleans.OrleansTelemetryConsumers.AI](https://www.nuget.org/packages/Microsoft.Orleans.OrleansTelemetryConsumers.AI/)
+- Trace publisher: [Microsoft.Extensions.Logging.ApplicationInsights](https://www.nuget.org/packages/Microsoft.Extensions.Logging.ApplicationInsights)
+
 ## Supported telemetry:
 
 - Changes in grain lifecycle like (de)activations are logged as custom events.
