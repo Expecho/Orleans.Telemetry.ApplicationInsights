@@ -42,7 +42,7 @@ public MyGrain(GrainActivationTelemetryLogger grainActivationTelemetryLogger)
 }
 ```
 
-### Tracking siloe lifecycle events
+### Tracking silo lifecycle events
 
 ```csharp
 services.AddSiloLifecycleTelemetryLogger();
