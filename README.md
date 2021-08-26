@@ -37,7 +37,7 @@ services.AddGrainLifecycleTelemetryLogger();
 Inject a GrainActivationTelemetryLogger in the grain to have it paticipate in the lifecycle tracking:
 
 ```csharp
-public MyGrain(GrainActivationTelemetryLogger grainActivationTelemetryLogger)
+public MyGrain(GrainLifecycleTelemetryLogger grainLifecycleTelemetryLogger)
 {
 }
 ```
