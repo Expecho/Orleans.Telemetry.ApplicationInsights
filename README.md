@@ -24,8 +24,7 @@ Configuration is done when building the silo. It is assumed the TelemetryClient 
 ### Tracking calls between grains
 
 ```csharp
-siloBuilder.AddIncomingGrainCallFilter<IncomingCallTelemetryLogger>();
-siloBuilder.AddIncomingGrainCallFilter<OutgoingCallTelemetryLogger>();
+siloBuilder.AddGrainMessagingTelemetryLogger();
 ```
 
 ### Tracking grain lifecycle events
