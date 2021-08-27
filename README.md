@@ -24,7 +24,8 @@ Configuration is done when building the silo. It is assumed the TelemetryClient 
 ### Tracking calls between grains
 
 ```csharp
-siloBuilder.AddGrainMessagingTelemetryLogger();
+siloBuilder.AddIncomingGrainCallFilter<IncomingCallTelemetryLogger>();
+siloBuilder.AddIncomingGrainCallFilter<OutgoingCallTelemetryLogger>();
 ```
 
 ### Tracking grain lifecycle events
@@ -36,7 +37,7 @@ services.AddGrainLifecycleTelemetryLogger();
 Inject a GrainActivationTelemetryLogger in the grain to have it paticipate in the lifecycle tracking:
 
 ```csharp
-public MyGrain(GrainActivationTelemetryLogger grainActivationTelemetryLogger)
+public MyGrain(GrainLifecycleTelemetryLogger grainLifecycleTelemetryLogger)
 {
 }
 ```
@@ -46,3 +47,5 @@ public MyGrain(GrainActivationTelemetryLogger grainActivationTelemetryLogger)
 ```csharp
 services.AddSiloLifecycleTelemetryLogger();
 ```
+
+The following properties are added to the event telemetry: siloName, siloAddress and clusterId.
