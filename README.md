@@ -10,22 +10,21 @@ Related packages:
 
 - Changes in grain lifecycle like (de)activations are logged as custom events.
 - Changes in sile lifecycle are logged as custom events.
-- Track incoming and/or outgoing grains calls as dependency telemetry.
+- Track grain calls as dependency telemetry.
 
 Telemetry outputted due to grain activity is enriched with the following custom properties:
 
 - grainId (guid/long/string/compound)
 - grainType
 
-## Configuring
+## Usage
 
 Configuration is done when building the silo. It is assumed the TelemetryClient is available using Dependency Injection.
 
-### Tracking incoming/outgoing calls
+### Tracking calls between grains
 
 ```csharp
-siloBuilder.AddIncomingGrainCallFilter<IncomingCallTelemetryLogger>();
-siloBuilder.AddIncomingGrainCallFilter<OutgoingCallTelemetryLogger>();
+siloBuilder.AddGrainMessagingTelemetryLogger();
 ```
 
 ### Tracking grain lifecycle events
@@ -42,7 +41,7 @@ public MyGrain(GrainActivationTelemetryLogger grainActivationTelemetryLogger)
 }
 ```
 
-### Tracking siloe lifecycle events
+### Tracking silo lifecycle events
 
 ```csharp
 services.AddSiloLifecycleTelemetryLogger();

@@ -20,15 +20,20 @@ namespace Orleans.Telemetry.ApplicationInsights
 
         public async Task Invoke(IIncomingGrainCallContext context)
         {
-            if (!_grainTypeContainer.ContainsGrain(context.ImplementationMethod.DeclaringType))
+            if (!_grainTypeContainer.ContainsGrain(context.InterfaceMethod.DeclaringType))
             {
                 await context.Invoke();
                 return;
             }
 
-            using (var operation = _telemetryClient.StartOperation<DependencyTelemetry>($"{context.ImplementationMethod.DeclaringType?.FullName}.{context.ImplementationMethod.Name}"))
+            var parentTraceId = RequestContext.Get(TelemetryCorrelationProvider.ParentId)?.ToString();
+            var operationId = RequestContext.Get(TelemetryCorrelationProvider.OperationId)?.ToString();
+
+            using (var operation = _telemetryClient.StartOperation<DependencyTelemetry>($"{context.InterfaceMethod.DeclaringType?.FullName}.{context.ImplementationMethod.Name}"))
             {
                 var grainId = context.Grain.GetGraindId();
+                operation.Telemetry.Context.Operation.ParentId = parentTraceId;
+                operation.Telemetry.Context.Operation.Id = operationId;
                 operation.Telemetry.Success = true;
                 operation.Telemetry.Type = "Orleans Actor MessageIn";
                 operation.Telemetry.Target = $"{_localSiloDetails.ClusterId}.{_localSiloDetails.SiloAddress}.{grainId}";
