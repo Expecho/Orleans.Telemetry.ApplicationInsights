@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Orleans.Runtime;
@@ -25,8 +26,21 @@ namespace Orleans.Telemetry.ApplicationInsights
 
         public void Participate(IGrainLifecycle lifecycle)
         {
-            lifecycle.Subscribe<GrainLifecycleTelemetryLogger>(GrainLifecycleStage.Activate, token => TrackLifecycleEvent("Orleans.Grain.ActiveStateStarted"), token => TrackLifecycleEvent("Orleans.Grain.ActiveStateEnded"));
+            lifecycle.Subscribe<GrainLifecycleTelemetryLogger>(GrainLifecycleStage.Activate,
+                token =>
+                {
+                    SetCorrelationDataOnActivation();
+                    return TrackLifecycleEvent("Orleans.Grain.ActiveStateStarted");
+                },
+                token => TrackLifecycleEvent("Orleans.Grain.ActiveStateEnded"));
             lifecycle.Subscribe<GrainLifecycleTelemetryLogger>(GrainLifecycleStage.SetupState, token => TrackLifecycleEvent("Orleans.Grain.SetupStateStarted"));
+        }
+
+        private void SetCorrelationDataOnActivation()
+        {
+            Activity.Current?
+                .AddBaggage("grainId", _context.GrainInstance.GetGraindId().ToString())
+                .AddBaggage("grainType", _context.GrainType.FullName);
         }
 
         private Task TrackLifecycleEvent(string stage)
