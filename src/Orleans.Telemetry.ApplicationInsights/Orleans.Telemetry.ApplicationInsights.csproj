@@ -4,7 +4,10 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>expecho</Authors>
-    <Company>brinksoftware</Company>
+    <Company>expecho</Company>
+    <RepositoryUrl>https://github.com/Expecho/Orleans.Telemetry.ApplicationInsights</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Expecho/Orleans.Telemetry.ApplicationInsights</PackageProjectUrl>
+    <Description>Send grain telemetry to Azure Application Insights. Orleans is already able to log metrics and traces to Application Insights but it does not support writing Application Insights specific telemetry types like custom events and dependendencies out-of-the-box.</Description>
   </PropertyGroup>
 
   <ItemGroup>
