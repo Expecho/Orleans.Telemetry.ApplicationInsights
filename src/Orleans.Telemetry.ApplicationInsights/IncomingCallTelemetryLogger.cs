@@ -29,7 +29,7 @@ namespace Orleans.Telemetry.ApplicationInsights
             var parentTraceId = RequestContext.Get(TelemetryCorrelationProvider.ParentId)?.ToString();
             var operationId = RequestContext.Get(TelemetryCorrelationProvider.OperationId)?.ToString();
 
-            using (var operation = _telemetryClient.StartOperation<DependencyTelemetry>($"{context.InterfaceMethod.DeclaringType?.FullName}.{context.ImplementationMethod.Name}"))
+            using (var operation = _telemetryClient.StartOperation<DependencyTelemetry>($"{context.InterfaceMethod.DeclaringType?.FullName}.{context.InterfaceMethod.Name}"))
             {
                 var grainId = context.Grain.GetGraindId();
                 operation.Telemetry.Context.Operation.ParentId = parentTraceId;
@@ -38,7 +38,7 @@ namespace Orleans.Telemetry.ApplicationInsights
                 operation.Telemetry.Type = "Orleans Actor MessageIn";
                 operation.Telemetry.Target = $"{_localSiloDetails.ClusterId}.{_localSiloDetails.SiloAddress}.{grainId}";
                 operation.Telemetry.Properties["grainId"] = grainId.ToString();
-                operation.Telemetry.Properties["grainType"] = context.ImplementationMethod.DeclaringType?.FullName;
+                operation.Telemetry.Properties["grainType"] = context.InterfaceMethod.DeclaringType?.FullName;
 
                 if (context.Arguments != null)
                     operation.Telemetry.Data = string.Join(", ", context.Arguments);

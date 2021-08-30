@@ -19,5 +19,10 @@ namespace Orleans.Telemetry.ApplicationInsights
         {
             return services.AddSingleton<ILifecycleParticipant<ISiloLifecycle>, SiloLifecycleTelemetryLogger>();
         }
+
+        public static IServiceCollection AddDefaultInterceptableGrainTypeContainer(this IServiceCollection services)
+        {
+            return services.AddSingleton<IInterceptableGrainTypeContainer, DefaultInterceptableGrainTypeContainer>();
+        }
     }
 }

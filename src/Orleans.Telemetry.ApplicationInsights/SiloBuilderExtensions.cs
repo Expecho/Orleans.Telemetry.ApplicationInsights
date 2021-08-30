@@ -7,9 +7,9 @@ namespace Orleans.Telemetry.ApplicationInsights
     {
         public static ISiloBuilder AddGrainMessagingTelemetryLogger(this ISiloBuilder builder)
         {
-            return builder
-                .ConfigureServices(services => services.AddSingleton<IOutgoingGrainCallFilter, TelemetryCorrelationProvider>())
-                .ConfigureServices(services => services.AddSingleton<IIncomingGrainCallFilter, IncomingCallTelemetryLogger>());
+            return builder.ConfigureServices(services =>
+                services.AddSingleton<IOutgoingGrainCallFilter, TelemetryCorrelationProvider>()
+                        .AddSingleton<IIncomingGrainCallFilter, IncomingCallTelemetryLogger>());
         }
     }
 }

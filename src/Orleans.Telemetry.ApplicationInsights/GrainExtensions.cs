@@ -18,7 +18,7 @@ namespace Orleans.Telemetry.ApplicationInsights
                     var guidKey = grain.GetPrimaryKey(out var guidExt);
                     return $"{guidKey}.{guidExt}";
                 case IGrainWithIntegerCompoundKey _:
-                    var intKey = grain.GetPrimaryKey(out var intExt);
+                    var intKey = grain.GetPrimaryKeyLong(out var intExt);
                     return $"{intKey}.{intExt}";
                 default:
                     return grain.ToString();
