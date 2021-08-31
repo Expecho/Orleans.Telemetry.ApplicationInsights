@@ -4,7 +4,7 @@ namespace Orleans.Telemetry.ApplicationInsights
 {
     public static class GrainExtensions
     {
-        public static object GetGraindId(this IAddressable grain)
+        public static object GetGrainId(this IAddressable grain)
         {
             switch (grain)
             {

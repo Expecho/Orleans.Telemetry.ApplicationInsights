@@ -39,7 +39,7 @@ namespace Orleans.Telemetry.ApplicationInsights
         private void SetCorrelationDataOnActivation()
         {
             Activity.Current?
-                .AddBaggage("grainId", _context.GrainInstance.GetGraindId().ToString())
+                .AddBaggage("grainId", _context.GrainInstance.GetGrainId().ToString())
                 .AddBaggage("grainType", _context.GrainType.FullName);
         }
 
@@ -47,7 +47,7 @@ namespace Orleans.Telemetry.ApplicationInsights
         {
             _telemetryClient.TrackEvent(stage, new Dictionary<string, string>
             {
-                {"grainId", _context.GrainInstance.GetGraindId().ToString()},
+                {"grainId", _context.GrainInstance.GetGrainId().ToString()},
                 {"grainType", _context.GrainType.FullName}
             });
 

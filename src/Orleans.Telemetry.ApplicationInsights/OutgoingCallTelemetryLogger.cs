@@ -28,7 +28,7 @@ namespace Orleans.Telemetry.ApplicationInsights
 
             using (var operation = _telemetryClient.StartOperation<DependencyTelemetry>($"{context.InterfaceMethod.DeclaringType?.FullName}.{context.InterfaceMethod.Name}"))
             {
-                var grainId = context.Grain.GetGraindId();
+                var grainId = context.Grain.GetGrainId();
                 operation.Telemetry.Success = true;
                 operation.Telemetry.Type = "Orleans Actor MessageOut";
                 operation.Telemetry.Target = $"{_localSiloDetails.ClusterId}.{_localSiloDetails.SiloAddress}.{grainId}";

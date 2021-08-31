@@ -31,7 +31,7 @@ namespace Orleans.Telemetry.ApplicationInsights
 
             using (var operation = _telemetryClient.StartOperation<DependencyTelemetry>($"{context.InterfaceMethod.DeclaringType?.FullName}.{context.InterfaceMethod.Name}"))
             {
-                var grainId = context.Grain.GetGraindId();
+                var grainId = context.Grain.GetGrainId();
                 operation.Telemetry.Context.Operation.ParentId = parentTraceId;
                 operation.Telemetry.Context.Operation.Id = operationId;
                 operation.Telemetry.Success = true;
