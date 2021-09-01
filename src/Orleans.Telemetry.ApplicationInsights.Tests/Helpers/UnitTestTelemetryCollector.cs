@@ -4,7 +4,7 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 using Orleans.Runtime;
 
-namespace Orleans.Telemetry.ApplicationInsights.Tests
+namespace Orleans.Telemetry.ApplicationInsights.Tests.Helpers
 {
     public class UnitTestTelemetryCollector : ITelemetryInitializer
     {

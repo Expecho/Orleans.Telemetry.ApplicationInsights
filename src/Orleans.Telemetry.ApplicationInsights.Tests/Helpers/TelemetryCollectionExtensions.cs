@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 
-namespace Orleans.Telemetry.ApplicationInsights.Tests
+namespace Orleans.Telemetry.ApplicationInsights.Tests.Helpers
 {
     public static class TelemetryCollectionExtensions
     {

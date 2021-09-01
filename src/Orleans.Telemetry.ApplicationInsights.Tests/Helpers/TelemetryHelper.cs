@@ -8,7 +8,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans.TestingHost;
 
-namespace Orleans.Telemetry.ApplicationInsights.Tests
+namespace Orleans.Telemetry.ApplicationInsights.Tests.Helpers
 {
     public static class TelemetryHelper
     {

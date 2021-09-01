@@ -32,7 +32,8 @@ namespace Orleans.Telemetry.ApplicationInsights
                     SetCorrelationDataOnActivation();
                     return TrackLifecycleEvent("Orleans.Grain.ActiveStateStarted");
                 },
-                token => TrackLifecycleEvent("Orleans.Grain.ActiveStateEnded"));
+                token => 
+                    TrackLifecycleEvent("Orleans.Grain.ActiveStateEnded"));
             lifecycle.Subscribe<GrainLifecycleTelemetryLogger>(GrainLifecycleStage.SetupState, token => TrackLifecycleEvent("Orleans.Grain.SetupStateStarted"));
         }
 

@@ -7,7 +7,7 @@ using Orleans.Hosting;
 using Orleans.TestingHost;
 using Xunit;
 
-namespace Orleans.Telemetry.ApplicationInsights.Tests
+namespace Orleans.Telemetry.ApplicationInsights.Tests.Helpers
 {
     public sealed class ClusterFixture : IDisposable
     {
@@ -27,7 +27,7 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests
         public TestCluster Cluster { get; }
     }
 
-    [CollectionDefinition(ClusterCollection.Name)]
+    [CollectionDefinition(Name)]
     public class ClusterCollection : ICollectionFixture<ClusterFixture>
     {
         public const string Name = "ClusterCollection";

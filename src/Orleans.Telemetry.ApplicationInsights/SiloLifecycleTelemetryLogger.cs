@@ -18,7 +18,8 @@ namespace Orleans.Telemetry.ApplicationInsights
 
         public void Participate(ISiloLifecycle lifecycle)
         {
-            lifecycle.Subscribe<SiloLifecycleTelemetryLogger>(ServiceLifecycleStage.Active, token => TrackLifecycleEvent("Orleans.Silo.ActiveStageStarted"), token => TrackLifecycleEvent("Orleans.Silo.ActiveStageEnded"));
+            lifecycle.Subscribe<SiloLifecycleTelemetryLogger>(ServiceLifecycleStage.Active, token => TrackLifecycleEvent("Orleans.Silo.ActiveStageStarted"), 
+                token => TrackLifecycleEvent("Orleans.Silo.ActiveStageEnded"));
             lifecycle.Subscribe<SiloLifecycleTelemetryLogger>(ServiceLifecycleStage.AfterRuntimeGrainServices, token => TrackLifecycleEvent("Orleans.Silo.AfterRuntimeGrainServicesStageStarted"));
             lifecycle.Subscribe<SiloLifecycleTelemetryLogger>(ServiceLifecycleStage.ApplicationServices, token => TrackLifecycleEvent("Orleans.Silo.ApplicationServicesStageStarted"));
             lifecycle.Subscribe<SiloLifecycleTelemetryLogger>(ServiceLifecycleStage.BecomeActive, token => TrackLifecycleEvent("Orleans.Silo.BecomeActiveStageStarted"));
