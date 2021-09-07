@@ -2,7 +2,7 @@
 
 Send grain and silo telemetry to [Azure Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview). Orleans is already able to log metrics and traces to Application Insights but it does not support writing Application Insights specific telemetry types like custom events and dependendencies out-of-the-box. This package addresses that.
 
-[Download the NuGet package](https://www.nuget.org/packages/Orleans.Telemetry.ApplicationInsights) [![NuGet Status](http://img.shields.io/nuget/v/https://www.nuget.org/packages/Orleans.Telemetry.ApplicationInsights.svg?style=flat)](https://www.nuget.org/packages/Orleans.Telemetry.ApplicationInsights/)
+[Download the NuGet package](https://www.nuget.org/packages/Orleans.Telemetry.ApplicationInsights) [![NuGet Status](https://img.shields.io/nuget/v/Orleans.Telemetry.ApplicationInsights)](https://www.nuget.org/packages/Orleans.Telemetry.ApplicationInsights/)
 
 Related packages:
 - Metrics publisher: [Microsoft.Orleans.OrleansTelemetryConsumers.AI](https://www.nuget.org/packages/Microsoft.Orleans.OrleansTelemetryConsumers.AI/)
