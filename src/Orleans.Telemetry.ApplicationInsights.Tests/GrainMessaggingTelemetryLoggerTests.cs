@@ -21,7 +21,7 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests
         }
 
         [Fact]
-        public async Task WhenActorIsCalledShouldLogIncomingCall()
+        public async Task WhenGrainsIsCalledShouldLogIncomingCall()
         {
             var invocationId = Guid.NewGuid();
             RequestContext.Set("invocationId", invocationId);
@@ -42,7 +42,7 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests
         }
         
         [Fact]
-        public async Task WhenActorCallsOtherActorShouldLogOutgoingCall()
+        public async Task WhenGrainsCallsOtherGrainsShouldLogOutgoingCall()
         {
             var invocationId = Guid.NewGuid();
             RequestContext.Set("invocationId", invocationId);
@@ -64,7 +64,7 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests
         }
 
         [Fact]
-        public async Task WhenActorsCommunicateShouldCorrelateTelemetry()
+        public async Task WhenGrainsCommunicateShouldCorrelateTelemetry()
         {
             var invocationId = Guid.NewGuid();
             RequestContext.Set("invocationId", invocationId);

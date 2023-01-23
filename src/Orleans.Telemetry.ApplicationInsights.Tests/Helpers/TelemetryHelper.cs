@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -17,8 +18,13 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Helpers
             return await GetProducedTelemetryAsync<ITelemetry>(cluster);
         }
 
-        public static async Task<IEnumerable<T>> GetProducedTelemetryAsync<T>(TestCluster cluster) where T : ITelemetry
+        public static async Task<IEnumerable<T>> GetProducedTelemetryAsync<T>(TestCluster cluster, TimeSpan? delayBeforeTelemetryRetrieval = null) where T : ITelemetry
         {
+            if(delayBeforeTelemetryRetrieval != null)
+            {
+                await Task.Delay(delayBeforeTelemetryRetrieval.Value);
+            }
+
             var telemetryItems = new List<T>();
 
             foreach (var silo in cluster.GetActiveSilos().OfType<InProcessSiloHandle>())

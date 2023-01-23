@@ -50,13 +50,14 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Helpers
                             options.EnablePerformanceCounterCollectionModule = false;
                             options.EnableQuickPulseMetricStream = false;
                         })
-                        .AddSingleton<IInterceptableGrainTypeContainer>(_ => 
+                        .AddSingleton<IInterceptableGrainTypeContainer>(_ =>
                             new DefaultInterceptableGrainTypeContainer(Assembly.GetExecutingAssembly()))
                         .AddGrainLifecycleTelemetryLogger()
                         .AddSiloLifecycleTelemetryLogger()
                         .AddSingleton<IOutgoingGrainCallFilter, OutgoingCallTelemetryLogger>()
                         .AddSingleton<ITelemetryInitializer, UnitTestTelemetryCollector>();
                 })
+                .UseInMemoryReminderService()
                 .AddGrainMessagingTelemetryLogger();
         }
     }
