@@ -1,30 +1,35 @@
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Orleans.Hosting;
 using Orleans.TestingHost;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Orleans.Telemetry.ApplicationInsights.Tests.Helpers
 {
-    public sealed class ClusterFixture : IDisposable
+    public class ClusterFixture : IAsyncLifetime
     {
-        public ClusterFixture()
+        public ClusterFixture(ITestOutputHelper testOutputHelper)
         {
+            TestOutputHelper = testOutputHelper;
+
             var builder = new TestClusterBuilder();
             builder.AddSiloBuilderConfigurator<TestSiloConfigurations>();
             Cluster = builder.Build();
-            Cluster.Deploy();
-        }
-
-        public void Dispose()
-        {
-            Cluster.StopAllSilos();
         }
 
         public TestCluster Cluster { get; }
+
+        public ITestOutputHelper TestOutputHelper { get; }
+
+        public Task DisposeAsync() => this.Cluster.DisposeAsync().AsTask();
+
+        public Task InitializeAsync() => this.Cluster.DeployAsync();
     }
 
     [CollectionDefinition(Name)]
@@ -56,6 +61,12 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Helpers
                         .AddSiloLifecycleTelemetryLogger()
                         .AddSingleton<IOutgoingGrainCallFilter, OutgoingCallTelemetryLogger>()
                         .AddSingleton<ITelemetryInitializer, UnitTestTelemetryCollector>();
+                })
+                .ConfigureLogging(builder =>
+                {
+                    builder
+                        .AddDebug()
+                        .AddConsole();
                 })
                 .UseInMemoryReminderService()
                 .AddGrainMessagingTelemetryLogger();

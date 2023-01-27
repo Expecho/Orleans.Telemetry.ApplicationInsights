@@ -5,29 +5,25 @@ using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.DataContracts;
 using Orleans.Telemetry.ApplicationInsights.Tests.Grains;
 using Orleans.Telemetry.ApplicationInsights.Tests.Helpers;
-using Orleans.TestingHost;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Orleans.Telemetry.ApplicationInsights.Tests
 {
-    [Collection(ClusterCollection.Name)]
-    public class GrainLifeCycleTelemetryLoggerTests
+    public class GrainLifeCycleTelemetryLoggerTests : ClusterFixture
     {
-        private readonly TestCluster _cluster;
-
-        public GrainLifeCycleTelemetryLoggerTests(ClusterFixture fixture)
+        public GrainLifeCycleTelemetryLoggerTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            _cluster = fixture.Cluster;
         }
 
         [Fact]
         public async Task WhenGrainStartedShouldLogLifecycle()
         {
             var grainId = Guid.NewGuid();
-            var grain = _cluster.Client.GetGrain<ILifeCycleTestGrain>(grainId);
+            var grain = Cluster.Client.GetGrain<ILifeCycleTestGrain>(grainId);
             await grain.Activate();
             
-            var telemetry = (await TelemetryHelper.GetProducedTelemetryAsync<EventTelemetry>(_cluster)).ToList();
+            var telemetry = (await TelemetryHelper.GetProducedTelemetryAsync<EventTelemetry>(Cluster)).ToList();
             GetLifecyceEventTelemetry(telemetry, "Orleans.Grain.ActiveStateStarted", grainId);
             GetLifecyceEventTelemetry(telemetry, "Orleans.Grain.SetupStateStarted", grainId);
         }
@@ -36,10 +32,10 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests
         public async Task WhenGrainDeactivateShouldLogLifecycle()
         {
             var grainId = Guid.NewGuid();
-            var grain = _cluster.Client.GetGrain<ILifeCycleTestGrain>(grainId);
+            var grain = Cluster.Client.GetGrain<ILifeCycleTestGrain>(grainId);
             await grain.DeActivate();
 
-            var telemetry = (await TelemetryHelper.GetProducedTelemetryAsync<EventTelemetry>(_cluster, TimeSpan.FromSeconds(5))).ToList();
+            var telemetry = (await TelemetryHelper.GetProducedTelemetryAsync<EventTelemetry>(Cluster, TimeSpan.FromSeconds(5))).ToList();
             GetLifecyceEventTelemetry(telemetry, "Orleans.Grain.ActiveStateEnded", grainId);
         }
 

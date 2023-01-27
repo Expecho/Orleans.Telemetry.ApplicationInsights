@@ -3,25 +3,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.DataContracts;
 using Orleans.Telemetry.ApplicationInsights.Tests.Helpers;
-using Orleans.TestingHost;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Orleans.Telemetry.ApplicationInsights.Tests
 {
-    [Collection(ClusterCollection.Name)]
-    public class SiloLifeCycleTelemetryLoggerTests
+    public class SiloLifeCycleTelemetryLoggerTests : ClusterFixture
     {
-        private readonly TestCluster _cluster;
-
-        public SiloLifeCycleTelemetryLoggerTests(ClusterFixture fixture)
+        public SiloLifeCycleTelemetryLoggerTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            _cluster = fixture.Cluster;
         }
 
         [Fact]
         public async Task WhenSiloStartedShouldLogLifecycle()
         {
-            var telemetry = (await TelemetryHelper.GetProducedTelemetryAsync<EventTelemetry>(_cluster)).ToList();
+            var telemetry = (await TelemetryHelper.GetProducedTelemetryAsync<EventTelemetry>(Cluster)).ToList();
             GetLifecyceEventTelemetry(telemetry, "Orleans.Silo.ActiveStageStarted");
             GetLifecyceEventTelemetry(telemetry, "Orleans.Silo.AfterRuntimeGrainServicesStageStarted");
             GetLifecyceEventTelemetry(telemetry, "Orleans.Silo.ApplicationServicesStageStarted");
@@ -36,9 +32,9 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests
         {
             return telemetry.First(t =>
                 t.Name == stage &&
-                t.Properties["siloAddress"] == _cluster.Primary.SiloAddress.ToString() &&
-                t.Properties["siloName"] == _cluster.Primary.Name &&
-                t.Properties["clusterId"] == _cluster.Options.ClusterId);
+                t.Properties["siloAddress"] == Cluster.Primary.SiloAddress.ToString() &&
+                t.Properties["siloName"] == Cluster.Primary.Name &&
+                t.Properties["clusterId"] == Cluster.Options.ClusterId);
         }
     }
 }

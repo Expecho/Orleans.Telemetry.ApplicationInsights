@@ -14,7 +14,7 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Grains
     public class RemindedGrain : Grain, IRemindedGrain, IRemindable
     {
         private readonly TaskCompletionSource _taskCompletionSource;
-
+        
         public RemindedGrain(GrainLifecycleTelemetryLogger grainLifecycleTelemetryLogger)
         {
             _taskCompletionSource = new TaskCompletionSource();

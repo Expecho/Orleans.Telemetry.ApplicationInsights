@@ -5,19 +5,15 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Orleans.Runtime;
 using Orleans.Telemetry.ApplicationInsights.Tests.Grains;
 using Orleans.Telemetry.ApplicationInsights.Tests.Helpers;
-using Orleans.TestingHost;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Orleans.Telemetry.ApplicationInsights.Tests
 {
-    [Collection(ClusterCollection.Name)]
-    public class GrainMessaggingTelemetryLoggerTests
+    public class GrainMessaggingTelemetryLoggerTests : ClusterFixture
     {
-        private readonly TestCluster _cluster;
-
-        public GrainMessaggingTelemetryLoggerTests(ClusterFixture fixture)
+        public GrainMessaggingTelemetryLoggerTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            _cluster = fixture.Cluster;
         }
 
         [Fact]
@@ -29,10 +25,10 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests
             var grainId = Guid.NewGuid();
             const string message = "Hello";
 
-            var grain = _cluster.Client.GetGrain<ICallerGrain>(grainId);
+            var grain = Cluster.Client.GetGrain<ICallerGrain>(grainId);
             await grain.SendMessageToGrain(message);
 
-            var telemetry = await TelemetryHelper.GetProducedTelemetryAsync<DependencyTelemetry>(_cluster);
+            var telemetry = await TelemetryHelper.GetProducedTelemetryAsync<DependencyTelemetry>(Cluster);
             var expectedIncomingCallTelemetry = telemetry.GetIncomingGrainMessageTelemetry<ICallerGrain>(
                 invocationId,
                 g => g.SendMessageToGrain(message));
@@ -51,10 +47,10 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests
             const string message = "Hello";
             const string calledGrainCompoundKey = "5.keyExt";
 
-            var grain = _cluster.Client.GetGrain<ICallerGrain>(callerGrainId);
+            var grain = Cluster.Client.GetGrain<ICallerGrain>(callerGrainId);
             await grain.SendMessageToGrain(message);
 
-            var telemetry = await TelemetryHelper.GetProducedTelemetryAsync<DependencyTelemetry>(_cluster);
+            var telemetry = await TelemetryHelper.GetProducedTelemetryAsync<DependencyTelemetry>(Cluster);
             var expectedOutgoingCallTelemetry = telemetry.GetOutgoingGrainMessageTelemetry<ICalledGrain>(
                 invocationId,
                 g => g.ReceiveMessage(message));
@@ -72,10 +68,10 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests
             var callerGrainId = Guid.NewGuid();
             const string message = "Hello";
 
-            var grain = _cluster.Client.GetGrain<ICallerGrain>(callerGrainId);
+            var grain = Cluster.Client.GetGrain<ICallerGrain>(callerGrainId);
             await grain.SendMessageToGrain(message);
 
-            var telemetry = (await TelemetryHelper.GetProducedTelemetryAsync<DependencyTelemetry>(_cluster)).ToList();
+            var telemetry = (await TelemetryHelper.GetProducedTelemetryAsync<DependencyTelemetry>(Cluster)).ToList();
             var sourceInboundCall = telemetry.GetIncomingGrainMessageTelemetry<ICallerGrain>(invocationId,
                 g => g.SendMessageToGrain(message));
 
