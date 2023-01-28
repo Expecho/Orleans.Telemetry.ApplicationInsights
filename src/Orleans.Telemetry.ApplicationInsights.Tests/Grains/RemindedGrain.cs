@@ -1,6 +1,7 @@
 ﻿using Orleans.Concurrency;
 using Orleans.Runtime;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Orleans.Telemetry.ApplicationInsights.Tests.Grains
@@ -15,16 +16,16 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Grains
     {
         private readonly TaskCompletionSource _taskCompletionSource;
         
-        public RemindedGrain(GrainLifecycleTelemetryLogger grainLifecycleTelemetryLogger)
+        public RemindedGrain()
         {
             _taskCompletionSource = new TaskCompletionSource();
         }
 
-        public override Task OnActivateAsync()
+        public override Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            RegisterOrUpdateReminder("TestReminder", TimeSpan.FromSeconds(10), TimeSpan.FromMinutes(1));
+            this.RegisterOrUpdateReminder("TestReminder", TimeSpan.FromSeconds(10), TimeSpan.FromMinutes(1));
 
-            return base.OnActivateAsync();
+            return base.OnActivateAsync(cancellationToken);
         }
 
         public Task ReceiveReminder(string reminderName, TickStatus status)

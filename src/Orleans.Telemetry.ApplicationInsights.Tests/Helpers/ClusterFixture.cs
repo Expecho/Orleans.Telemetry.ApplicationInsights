@@ -1,9 +1,4 @@
-using System;
-using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.ApplicationInsights.Channel;
-using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Orleans.Hosting;
 using Orleans.TestingHost;
@@ -43,33 +38,13 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Helpers
         public void Configure(ISiloBuilder siloBuilder)
         {
             siloBuilder
-                .ConfigureServices(services =>
-                {
-                    services.AddSingleton<ITelemetryChannel, InMemoryChannel>()
-                        .AddApplicationInsightsTelemetryWorkerService(options =>
-                        {
-                            options.DeveloperMode = true;
-                            options.EnableAdaptiveSampling = false;
-                            options.EnableEventCounterCollectionModule = false;
-                            options.EnableHeartbeat = false;
-                            options.EnablePerformanceCounterCollectionModule = false;
-                            options.EnableQuickPulseMetricStream = false;
-                        })
-                        .AddSingleton<IInterceptableGrainTypeContainer>(_ =>
-                            new DefaultInterceptableGrainTypeContainer(Assembly.GetExecutingAssembly()))
-                        .AddGrainLifecycleTelemetryLogger()
-                        .AddSiloLifecycleTelemetryLogger()
-                        .AddSingleton<IOutgoingGrainCallFilter, OutgoingCallTelemetryLogger>()
-                        .AddSingleton<ITelemetryInitializer, UnitTestTelemetryCollector>();
-                })
                 .ConfigureLogging(builder =>
                 {
                     builder
                         .AddDebug()
                         .AddConsole();
                 })
-                .UseInMemoryReminderService()
-                .AddGrainMessagingTelemetryLogger();
+                .UseInMemoryReminderService();
         }
     }
 }

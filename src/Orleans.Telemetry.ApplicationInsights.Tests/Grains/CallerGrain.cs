@@ -9,7 +9,7 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Grains
 
     public class CallerGrain : Grain, ICallerGrain
     {
-        public CallerGrain(GrainLifecycleTelemetryLogger grainLifecycleTelemetryLogger)
+        public CallerGrain()
         {
             
         }

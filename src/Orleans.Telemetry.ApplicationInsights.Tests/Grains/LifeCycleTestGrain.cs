@@ -10,11 +10,6 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Grains
 
     public class LifeCycleTestGrain : Grain, ILifeCycleTestGrain
     {
-        public LifeCycleTestGrain(GrainLifecycleTelemetryLogger grainLifecycleTelemetryLogger)
-        {
-
-        }
-
         public Task Activate()
         {
             return Task.CompletedTask;
