@@ -40,4 +40,8 @@
     <Orleans_CodeGenInputs Remove="Grains\LifeCycleTestGrain.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Orleans.Telemetry.ApplicationInsights\Orleans.Telemetry.ApplicationInsights.csproj" />
+  </ItemGroup>
+
 </Project>

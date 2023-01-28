@@ -10,7 +10,7 @@ namespace Orleans.Telemetry.ApplicationInsights
         {
             return services.AddTransient(sp =>
                 GrainLifecycleTelemetryLogger.Create(
-                    sp.GetRequiredService<IGrainActivationContext>(),
+                    sp.GetRequiredService<IGrainContextAccessor>(),
                     sp.GetRequiredService<TelemetryClient>()
                 ));
         }

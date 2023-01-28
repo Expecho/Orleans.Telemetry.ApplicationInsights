@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Orleans.Runtime;
@@ -28,15 +29,16 @@ namespace Orleans.Telemetry.ApplicationInsights
 
             using (var operation = _telemetryClient.StartOperation<DependencyTelemetry>($"{context.InterfaceMethod.DeclaringType?.FullName}.{context.InterfaceMethod.Name}"))
             {
-                var grainId = context.Grain.GetGrainId();
+                var grainId = context.TargetId;
                 operation.Telemetry.Success = true;
                 operation.Telemetry.Type = "Orleans Actor MessageOut";
                 operation.Telemetry.Target = $"{_localSiloDetails.ClusterId}.{_localSiloDetails.SiloAddress}.{grainId}";
                 operation.Telemetry.Properties["grainId"] = grainId.ToString();
                 operation.Telemetry.Properties["grainType"] = context.InterfaceMethod.DeclaringType?.FullName;
 
-                if (context.Arguments != null)
-                    operation.Telemetry.Data = string.Join(", ", context.Arguments);
+                var arguments = Enumerable.Range(0, context.Request.GetArgumentCount()).Select(context.Request.GetArgument);
+                if (arguments.Any())
+                    operation.Telemetry.Data = string.Join(", ", arguments);
 
                 try
                 {

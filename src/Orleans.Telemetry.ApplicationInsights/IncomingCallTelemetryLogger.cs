@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Orleans.Runtime;
@@ -31,7 +32,7 @@ namespace Orleans.Telemetry.ApplicationInsights
 
             using (var operation = _telemetryClient.StartOperation<DependencyTelemetry>($"{context.InterfaceMethod.DeclaringType?.FullName}.{context.InterfaceMethod.Name}"))
             {
-                var grainId = context.Grain.GetGrainId();
+                var grainId = context.SourceId;
                 operation.Telemetry.Context.Operation.ParentId = parentTraceId;
                 operation.Telemetry.Context.Operation.Id = operationId;
                 operation.Telemetry.Success = true;
@@ -40,8 +41,9 @@ namespace Orleans.Telemetry.ApplicationInsights
                 operation.Telemetry.Properties["grainId"] = grainId.ToString();
                 operation.Telemetry.Properties["grainType"] = context.InterfaceMethod.DeclaringType?.FullName;
 
-                if (context.Arguments != null)
-                    operation.Telemetry.Data = string.Join(", ", context.Arguments);
+                var arguments = Enumerable.Range(0, context.Request.GetArgumentCount()).Select(context.Request.GetArgument);
+                if (arguments.Any())
+                    operation.Telemetry.Data = string.Join(", ", arguments);
 
                 try
                 {
