@@ -20,7 +20,7 @@ namespace Orleans.Telemetry.ApplicationInsights
         {
             if (_grainTypeContainer.ContainsGrain(context.InterfaceMethod.DeclaringType))
             {
-                RequestContext.Set(ParentId, Activity.Current?.SpanId);
+                RequestContext.Set(ParentId, Activity.Current?.SpanId.ToString());
                 RequestContext.Set(OperationId, Activity.Current?.RootId);
             }
 

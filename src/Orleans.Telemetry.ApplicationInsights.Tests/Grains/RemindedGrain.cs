@@ -32,7 +32,7 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Grains
         {
             _taskCompletionSource.TrySetResult();
 
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
 
         public async Task WaitForReminder()

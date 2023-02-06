@@ -54,11 +54,10 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Helpers
                             options.EnablePerformanceCounterCollectionModule = false;
                             options.EnableQuickPulseMetricStream = false;
                         })
-                        .AddSingleton<IInterceptableGrainTypeContainer>(_ =>
-                            new DefaultInterceptableGrainTypeContainer(Assembly.GetExecutingAssembly()))
-                        .AddGrainLifecycleTelemetryLogger()
-                        .AddSiloLifecycleTelemetryLogger()
-                        .AddSingleton<IOutgoingGrainCallFilter, OutgoingCallTelemetryLogger>()
+                        .AddOrleansApplicationInsights(options =>
+                        {
+                            options.InterceptableGrainTypeContainer = new DefaultInterceptableGrainTypeContainer(Assembly.GetExecutingAssembly());
+                        })
                         .AddSingleton<ITelemetryInitializer, UnitTestTelemetryCollector>();
                 })
                 .ConfigureLogging(builder =>
@@ -67,8 +66,7 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Helpers
                         .AddDebug()
                         .AddConsole();
                 })
-                .UseInMemoryReminderService()
-                .AddGrainMessagingTelemetryLogger();
+                .UseInMemoryReminderService();
         }
     }
 }

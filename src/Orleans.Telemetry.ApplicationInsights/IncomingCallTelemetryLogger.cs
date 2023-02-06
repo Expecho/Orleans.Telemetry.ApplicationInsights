@@ -21,6 +21,12 @@ namespace Orleans.Telemetry.ApplicationInsights
 
         public async Task Invoke(IIncomingGrainCallContext context)
         {
+            var typeName = context.Grain switch
+            {
+                _ when context.Grain is IRemindable remindableGrain => (context.Grain as IRemindable).GetType(),
+                _ => context.InterfaceMethod.DeclaringType
+            };
+
             if (!_grainTypeContainer.ContainsGrain(context.InterfaceMethod.DeclaringType))
             {
                 await context.Invoke();
@@ -32,7 +38,7 @@ namespace Orleans.Telemetry.ApplicationInsights
 
             using (var operation = _telemetryClient.StartOperation<DependencyTelemetry>($"{context.InterfaceMethod.DeclaringType?.FullName}.{context.InterfaceMethod.Name}"))
             {
-                var grainId = context.SourceId;
+                var grainId = context.TargetId;
                 operation.Telemetry.Context.Operation.ParentId = parentTraceId;
                 operation.Telemetry.Context.Operation.Id = operationId;
                 operation.Telemetry.Success = true;
