@@ -21,6 +21,16 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Helpers
                 dt.Properties["grainType"] == methodCallExpression.Method.DeclaringType?.FullName);
         }
 
+        public static DependencyTelemetry GetIncomingGrainMessageTelemetry<T>(this IEnumerable<ITelemetry> telemetry, Expression<Func<T, Task>> expression) where T : IGrain
+        {
+            var methodCallExpression = (MethodCallExpression)expression.Body;
+
+            return telemetry.OfType<DependencyTelemetry>().FirstOrDefault(dt =>
+                dt.Type == "Orleans Actor MessageIn" &&
+                dt.Name == $"{methodCallExpression.Method.DeclaringType?.FullName}.{methodCallExpression.Method.Name}" &&
+                dt.Properties["grainType"] == methodCallExpression.Method.DeclaringType?.FullName);
+        }
+
         public static DependencyTelemetry GetOutgoingGrainMessageTelemetry<T>(this IEnumerable<ITelemetry> telemetry, Guid invocationId, Expression<Func<T, Task>> expression) where T : IGrain
         {
             var methodCallExpression = (MethodCallExpression)expression.Body;

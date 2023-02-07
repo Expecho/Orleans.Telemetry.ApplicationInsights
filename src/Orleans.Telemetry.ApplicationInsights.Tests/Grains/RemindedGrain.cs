@@ -9,13 +9,17 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Grains
     public interface IRemindedGrain : IGrainWithGuidKey
     {
         Task WaitForReminder();
+        Task ReceiveReminder(string reminderName, TickStatus status);
     }
 
     [Reentrant]
     public class RemindedGrain : Grain, IRemindedGrain, IRemindable
     {
         private readonly TaskCompletionSource _taskCompletionSource;
-        
+
+        public const string ReminderName = "TestReminder";
+
+
         public RemindedGrain()
         {
             _taskCompletionSource = new TaskCompletionSource();
@@ -23,7 +27,7 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Grains
 
         public override Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            this.RegisterOrUpdateReminder("TestReminder", TimeSpan.FromSeconds(10), TimeSpan.FromMinutes(1));
+            this.RegisterOrUpdateReminder(ReminderName, TimeSpan.FromSeconds(10), TimeSpan.FromMinutes(1));
 
             return base.OnActivateAsync(cancellationToken);
         }

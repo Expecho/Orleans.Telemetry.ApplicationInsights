@@ -21,13 +21,9 @@ namespace Orleans.Telemetry.ApplicationInsights
 
         public async Task Invoke(IIncomingGrainCallContext context)
         {
-            var typeName = context.Grain switch
-            {
-                _ when context.Grain is IRemindable remindableGrain => (context.Grain as IRemindable).GetType(),
-                _ => context.InterfaceMethod.DeclaringType
-            };
+            var typeName = context.Grain.GetType().FullName;
 
-            if (!_grainTypeContainer.ContainsGrain(context.InterfaceMethod.DeclaringType))
+            if (!_grainTypeContainer.ContainsGrain(context.InterfaceMethod.DeclaringType) && context.Grain is not IRemindable)
             {
                 await context.Invoke();
                 return;
@@ -36,7 +32,7 @@ namespace Orleans.Telemetry.ApplicationInsights
             var parentTraceId = RequestContext.Get(TelemetryCorrelationProvider.ParentId)?.ToString();
             var operationId = RequestContext.Get(TelemetryCorrelationProvider.OperationId)?.ToString();
 
-            using (var operation = _telemetryClient.StartOperation<DependencyTelemetry>($"{context.InterfaceMethod.DeclaringType?.FullName}.{context.InterfaceMethod.Name}"))
+            using (var operation = _telemetryClient.StartOperation<DependencyTelemetry>($"{typeName}.{context.InterfaceMethod.Name}"))
             {
                 var grainId = context.TargetId;
                 operation.Telemetry.Context.Operation.ParentId = parentTraceId;
@@ -45,7 +41,7 @@ namespace Orleans.Telemetry.ApplicationInsights
                 operation.Telemetry.Type = "Orleans Actor MessageIn";
                 operation.Telemetry.Target = $"{_localSiloDetails.ClusterId}.{_localSiloDetails.SiloAddress}.{grainId}";
                 operation.Telemetry.Properties["grainId"] = grainId.ToString();
-                operation.Telemetry.Properties["grainType"] = context.InterfaceMethod.DeclaringType?.FullName;
+                operation.Telemetry.Properties["grainType"] = typeName;
 
                 var arguments = Enumerable.Range(0, context.Request.GetArgumentCount()).Select(context.Request.GetArgument);
                 if (arguments.Any())
