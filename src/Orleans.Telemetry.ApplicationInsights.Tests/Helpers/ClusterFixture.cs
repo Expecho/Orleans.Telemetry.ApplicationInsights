@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.Channel;
@@ -27,9 +26,9 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Helpers
 
         public ITestOutputHelper TestOutputHelper { get; }
 
-        public Task DisposeAsync() => this.Cluster.DisposeAsync().AsTask();
+        public Task DisposeAsync() => Cluster.DisposeAsync().AsTask();
 
-        public Task InitializeAsync() => this.Cluster.DeployAsync();
+        public Task InitializeAsync() => Cluster.DeployAsync();
     }
 
     [CollectionDefinition(Name)]
@@ -55,11 +54,11 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Helpers
                             options.EnablePerformanceCounterCollectionModule = false;
                             options.EnableQuickPulseMetricStream = false;
                         })
-                        .AddSingleton<IInterceptableGrainTypeContainer>(_ =>
-                            new DefaultInterceptableGrainTypeContainer(Assembly.GetExecutingAssembly()))
-                        .AddGrainLifecycleTelemetryLogger()
-                        .AddSiloLifecycleTelemetryLogger()
-                        .AddSingleton<IOutgoingGrainCallFilter, OutgoingCallTelemetryLogger>()
+                        .AddOrleansApplicationInsights(options =>
+                        {
+                            options.TelemetryEnabledGrainTypeContainer = 
+                                new DefaultTelemetryEnabledGrainTypeContainer(Assembly.GetExecutingAssembly());
+                        })
                         .AddSingleton<ITelemetryInitializer, UnitTestTelemetryCollector>();
                 })
                 .ConfigureLogging(builder =>
@@ -68,8 +67,7 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Helpers
                         .AddDebug()
                         .AddConsole();
                 })
-                .UseInMemoryReminderService()
-                .AddGrainMessagingTelemetryLogger();
+                .UseInMemoryReminderService();
         }
     }
 }

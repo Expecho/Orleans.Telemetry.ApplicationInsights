@@ -22,19 +22,18 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests
             var invocationId = Guid.NewGuid();
             RequestContext.Set("invocationId", invocationId);
 
-            var grainId = Guid.NewGuid();
             const string message = "Hello";
 
-            var grain = Cluster.Client.GetGrain<ICallerGrain>(grainId);
+            var grain = Cluster.Client.GetGrain<ICallerGrain>(Guid.NewGuid());
             await grain.SendMessageToGrain(message);
 
             var telemetry = await TelemetryHelper.GetProducedTelemetryAsync<DependencyTelemetry>(Cluster);
-            var expectedIncomingCallTelemetry = telemetry.GetIncomingGrainMessageTelemetry<ICallerGrain>(
+            var expectedIncomingCallTelemetry = telemetry.GetIncomingGrainMessageTelemetry<CallerGrain>(
                 invocationId,
                 g => g.SendMessageToGrain(message));
 
             Assert.NotNull(expectedIncomingCallTelemetry);
-            Assert.Equal(grainId.ToString(), expectedIncomingCallTelemetry.Properties["grainId"]);
+            Assert.Equal(grain.GetGrainId().ToString(), expectedIncomingCallTelemetry.Properties["grainId"]);
         }
         
         [Fact]
@@ -43,12 +42,10 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests
             var invocationId = Guid.NewGuid();
             RequestContext.Set("invocationId", invocationId);
 
-            var callerGrainId = Guid.NewGuid();
             const string message = "Hello";
-            const string calledGrainCompoundKey = "5.keyExt";
-
-            var grain = Cluster.Client.GetGrain<ICallerGrain>(callerGrainId);
-            await grain.SendMessageToGrain(message);
+            
+            var grain = Cluster.Client.GetGrain<ICallerGrain>(Guid.NewGuid());
+            var targetGrainId = await grain.SendMessageToGrain(message);
 
             var telemetry = await TelemetryHelper.GetProducedTelemetryAsync<DependencyTelemetry>(Cluster);
             var expectedOutgoingCallTelemetry = telemetry.GetOutgoingGrainMessageTelemetry<ICalledGrain>(
@@ -56,7 +53,7 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests
                 g => g.ReceiveMessage(message));
 
             Assert.NotNull(expectedOutgoingCallTelemetry);
-            Assert.Equal(calledGrainCompoundKey, expectedOutgoingCallTelemetry.Properties["grainId"]);
+            Assert.Equal(targetGrainId, expectedOutgoingCallTelemetry.Properties["grainId"]);
         }
 
         [Fact]
@@ -65,17 +62,16 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests
             var invocationId = Guid.NewGuid();
             RequestContext.Set("invocationId", invocationId);
 
-            var callerGrainId = Guid.NewGuid();
             const string message = "Hello";
 
-            var grain = Cluster.Client.GetGrain<ICallerGrain>(callerGrainId);
+            var grain = Cluster.Client.GetGrain<ICallerGrain>(Guid.NewGuid());
             await grain.SendMessageToGrain(message);
 
             var telemetry = (await TelemetryHelper.GetProducedTelemetryAsync<DependencyTelemetry>(Cluster)).ToList();
-            var sourceInboundCall = telemetry.GetIncomingGrainMessageTelemetry<ICallerGrain>(invocationId,
+            var sourceInboundCall = telemetry.GetIncomingGrainMessageTelemetry<CallerGrain>(invocationId,
                 g => g.SendMessageToGrain(message));
 
-            var destinationOutboundCall = telemetry.GetIncomingGrainMessageTelemetry<ICalledGrain>(invocationId,
+            var destinationOutboundCall = telemetry.GetIncomingGrainMessageTelemetry<CalledGrain>(invocationId,
                 g => g.ReceiveMessage(message));
 
             var destinationInboundCall = telemetry.GetOutgoingGrainMessageTelemetry<ICalledGrain>(invocationId,
@@ -85,6 +81,23 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests
             Assert.Equal(sourceInboundCall.Context.Operation.Id, destinationInboundCall.Context.Operation.Id);
             Assert.Equal(sourceInboundCall.Id, destinationInboundCall.Context.Operation.ParentId);
             Assert.Equal(destinationInboundCall.Id, destinationOutboundCall.Context.Operation.ParentId);
+        }
+
+        [Fact]
+        public async Task WhenGrainRecievesReminderShouldLogIncomingCall()
+        {
+            var invocationId = Guid.NewGuid();
+            RequestContext.Set("invocationId", invocationId);
+
+            var grain = Cluster.Client.GetGrain<IRemindedGrain>(Guid.NewGuid());
+            await grain.WaitForReminder();
+
+            var telemetry = await TelemetryHelper.GetProducedTelemetryAsync<DependencyTelemetry>(Cluster);
+            var expectedIncomingCallTelemetry = telemetry.GetIncomingGrainMessageTelemetry<RemindedGrain>(
+                g => g.ReceiveReminder(RemindedGrain.ReminderName, new TickStatus()));
+
+            Assert.NotNull(expectedIncomingCallTelemetry);
+            Assert.Equal(grain.GetGrainId().ToString(), expectedIncomingCallTelemetry.Properties["grainId"]);
         }
     }
 }

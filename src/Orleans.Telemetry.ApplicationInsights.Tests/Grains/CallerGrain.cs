@@ -4,19 +4,21 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Grains
 {
     public interface ICallerGrain : IGrainWithGuidKey
     {
-        Task SendMessageToGrain(string message);
+        Task<string> SendMessageToGrain(string message);
     }
 
     public class CallerGrain : Grain, ICallerGrain
     {
-        public CallerGrain(GrainLifecycleTelemetryLogger grainLifecycleTelemetryLogger)
+        public CallerGrain()
         {
             
         }
 
-        public async Task SendMessageToGrain(string message)
+        public async Task<string> SendMessageToGrain(string message)
         {
-            await GrainFactory.GetGrain<ICalledGrain>(5, "keyExt").ReceiveMessage(message);
+            var targetGrain = GrainFactory.GetGrain<ICalledGrain>(5, "keyExt");
+            await targetGrain.ReceiveMessage(message);
+            return targetGrain.GetGrainId().ToString();
         }
     }
 }

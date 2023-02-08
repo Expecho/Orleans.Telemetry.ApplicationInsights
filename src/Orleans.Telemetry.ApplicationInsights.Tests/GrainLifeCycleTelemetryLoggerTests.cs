@@ -24,8 +24,8 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests
             await grain.Activate();
             
             var telemetry = (await TelemetryHelper.GetProducedTelemetryAsync<EventTelemetry>(Cluster)).ToList();
-            GetLifecyceEventTelemetry(telemetry, "Orleans.Grain.ActiveStateStarted", grainId);
-            GetLifecyceEventTelemetry(telemetry, "Orleans.Grain.SetupStateStarted", grainId);
+            GetLifecyceEventTelemetry(telemetry, "Orleans.Grain.ActiveStateStarted", grain.GetGrainId().ToString());
+            GetLifecyceEventTelemetry(telemetry, "Orleans.Grain.SetupStateStarted", grain.GetGrainId().ToString());
         }
 
         [Fact]
@@ -36,14 +36,14 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests
             await grain.DeActivate();
 
             var telemetry = (await TelemetryHelper.GetProducedTelemetryAsync<EventTelemetry>(Cluster, TimeSpan.FromSeconds(5))).ToList();
-            GetLifecyceEventTelemetry(telemetry, "Orleans.Grain.ActiveStateEnded", grainId);
+            GetLifecyceEventTelemetry(telemetry, "Orleans.Grain.ActiveStateEnded", grain.GetGrainId().ToString());
         }
 
-        private static EventTelemetry GetLifecyceEventTelemetry(IEnumerable<EventTelemetry> telemetry, string stage, Guid grainId)
+        private static EventTelemetry GetLifecyceEventTelemetry(IEnumerable<EventTelemetry> telemetry, string stage, string grainId)
         {
             return telemetry.Single(t => 
                 t.Name == stage &&
-                t.Properties["grainId"] == grainId.ToString() &&
+                t.Properties["grainId"] == grainId &&
                 t.Properties["grainType"] == typeof(LifeCycleTestGrain).FullName);
         }
     }
