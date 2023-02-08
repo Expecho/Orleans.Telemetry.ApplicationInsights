@@ -56,7 +56,8 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Helpers
                         })
                         .AddOrleansApplicationInsights(options =>
                         {
-                            options.TelemetryEnabledGrainTypeContainer = new DefaultTelemetryEnabledGrainTypeContainer(Assembly.GetExecutingAssembly());
+                            options.TelemetryEnabledGrainTypeContainer = 
+                                new DefaultTelemetryEnabledGrainTypeContainer(Assembly.GetExecutingAssembly());
                         })
                         .AddSingleton<ITelemetryInitializer, UnitTestTelemetryCollector>();
                 })
