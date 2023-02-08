@@ -27,7 +27,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Build output
-        path: /home/runner/work/src/Orleans.Telemetry.ApplicationInsightsn/Orleans.Telemetry.ApplicationInsights/bin/Release/
+        path: /home/runner/work/src/Orleans.Telemetry.ApplicationInsights/Orleans.Telemetry.ApplicationInsights/bin/Release/
     - name: Upload Package Build Artifact
       uses: actions/upload-artifact@v2
       with:
