@@ -10,9 +10,9 @@ namespace Orleans.Telemetry.ApplicationInsights
     {
         private readonly TelemetryClient _telemetryClient;
         private readonly ILocalSiloDetails _localSiloDetails;
-        private readonly IInterceptableGrainTypeContainer _grainTypeContainer;
+        private readonly ITelemetryEnabledGrainTypeContainer _grainTypeContainer;
 
-        public IncomingCallTelemetryLogger(TelemetryClient telemetryClient, ILocalSiloDetails localSiloDetails, IInterceptableGrainTypeContainer grainTypeContainer)
+        public IncomingCallTelemetryLogger(TelemetryClient telemetryClient, ILocalSiloDetails localSiloDetails, ITelemetryEnabledGrainTypeContainer grainTypeContainer)
         {
             _telemetryClient = telemetryClient;
             _localSiloDetails = localSiloDetails;
@@ -23,7 +23,7 @@ namespace Orleans.Telemetry.ApplicationInsights
         {
             var typeName = context.Grain.GetType().FullName;
 
-            if (!_grainTypeContainer.ContainsGrain(context.InterfaceMethod.DeclaringType) && context.Grain is not IRemindable)
+            if (!_grainTypeContainer.IncludeInTelemetry(context.InterfaceMethod.DeclaringType) && context.Grain is not IRemindable)
             {
                 await context.Invoke();
                 return;

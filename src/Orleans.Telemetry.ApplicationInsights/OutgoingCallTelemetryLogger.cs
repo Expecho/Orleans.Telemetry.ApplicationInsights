@@ -10,9 +10,9 @@ namespace Orleans.Telemetry.ApplicationInsights
     {
         private readonly TelemetryClient _telemetryClient;
         private readonly ILocalSiloDetails _localSiloDetails;
-        private readonly IInterceptableGrainTypeContainer _grainTypeContainer;
+        private readonly ITelemetryEnabledGrainTypeContainer _grainTypeContainer;
 
-        public OutgoingCallTelemetryLogger(TelemetryClient telemetryClient, ILocalSiloDetails localSiloDetails, IInterceptableGrainTypeContainer grainTypeContainer)
+        public OutgoingCallTelemetryLogger(TelemetryClient telemetryClient, ILocalSiloDetails localSiloDetails, ITelemetryEnabledGrainTypeContainer grainTypeContainer)
         {
             _telemetryClient = telemetryClient;
             _localSiloDetails = localSiloDetails;
@@ -21,7 +21,7 @@ namespace Orleans.Telemetry.ApplicationInsights
 
         public async Task Invoke(IOutgoingGrainCallContext context)
         {
-            if (!_grainTypeContainer.ContainsGrain(context.InterfaceMethod.DeclaringType))
+            if (!_grainTypeContainer.IncludeInTelemetry(context.InterfaceMethod.DeclaringType))
             {
                 await context.Invoke();
                 return;

@@ -10,7 +10,7 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Grains
 
     public class LifeCycleTestGrain : Grain, ILifeCycleTestGrain
     {
-        public LifeCycleTestGrain(GrainLifecycleTelemetryLogger grainLifecycleTelemetryLogger)
+        public LifeCycleTestGrain()
         {
         }
 

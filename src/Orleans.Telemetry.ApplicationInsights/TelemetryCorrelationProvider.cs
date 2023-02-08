@@ -9,16 +9,16 @@ namespace Orleans.Telemetry.ApplicationInsights
         internal const string ParentId = "ParentId";
         internal const string OperationId = "OperationId";
 
-        private readonly IInterceptableGrainTypeContainer _grainTypeContainer;
+        private readonly ITelemetryEnabledGrainTypeContainer _grainTypeContainer;
 
-        public TelemetryCorrelationProvider(IInterceptableGrainTypeContainer grainTypeContainer)
+        public TelemetryCorrelationProvider(ITelemetryEnabledGrainTypeContainer grainTypeContainer)
         {
             _grainTypeContainer = grainTypeContainer;
         }
 
         public async Task Invoke(IOutgoingGrainCallContext context)
         {
-            if (_grainTypeContainer.ContainsGrain(context.InterfaceMethod.DeclaringType))
+            if (_grainTypeContainer.IncludeInTelemetry(context.InterfaceMethod.DeclaringType))
             {
                 RequestContext.Set(ParentId, Activity.Current?.SpanId.ToString());
                 RequestContext.Set(OperationId, Activity.Current?.RootId);
