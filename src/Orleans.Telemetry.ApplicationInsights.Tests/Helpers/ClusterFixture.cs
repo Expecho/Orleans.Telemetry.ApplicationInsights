@@ -54,12 +54,12 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Helpers
                             options.EnablePerformanceCounterCollectionModule = false;
                             options.EnableQuickPulseMetricStream = false;
                         })
-                        .AddOrleansApplicationInsights(options =>
-                        {
-                            options.TelemetryEnabledGrainTypeContainer = 
-                                new DefaultTelemetryEnabledGrainTypeContainer(Assembly.GetExecutingAssembly());
-                        })
                         .AddSingleton<ITelemetryInitializer, UnitTestTelemetryCollector>();
+                })
+                .AddOrleansApplicationInsights(options =>
+                {
+                    options.TelemetryEnabledGrainTypeContainer =
+                        new DefaultTelemetryEnabledGrainTypeContainer(Assembly.GetExecutingAssembly());
                 })
                 .ConfigureLogging(builder =>
                 {
