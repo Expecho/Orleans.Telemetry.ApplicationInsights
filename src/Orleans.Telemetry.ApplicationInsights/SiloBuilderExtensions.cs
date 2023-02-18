@@ -1,29 +1,30 @@
 ﻿using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.DependencyInjection;
+using Orleans.Hosting;
 using Orleans.Runtime;
 using System;
 
 namespace Orleans.Telemetry.ApplicationInsights
 {
-    public static class ServiceCollectionExtensions
+    public static class SiloBuilderExtensions
     {
         /// <summary>
         /// Adds Application Insights Orleans Telemetry provider to service collection
         /// </summary>
-        /// <param name="services">The IServiceCollection</param>
-        /// <returns>The IServiceCollection</returns>
-        public static IServiceCollection AddOrleansApplicationInsights(this IServiceCollection services)
+        /// <param name="services">The ISiloBuilder</param>
+        /// <returns>The ISiloBuilder</returns>
+        public static ISiloBuilder AddOrleansApplicationInsights(this ISiloBuilder siloBuilder)
         {
-            return AddOrleansApplicationInsights(services, new TelemetryOptions());
+            return AddOrleansApplicationInsights(siloBuilder, new TelemetryOptions());
         }
 
         /// <summary>
         /// Adds Application Insights Orleans Telemetry provider to service collection
         /// </summary>
-        /// <param name="services">The IServiceCollection</param>
+        /// <param name="services">The ISiloBuilder</param>
         /// <param name="options">The Action used to configure the options</param>
-        /// <returns>The IServiceCollection</returns>
-        public static IServiceCollection AddOrleansApplicationInsights(this IServiceCollection services, Action<TelemetryOptions> options)
+        /// <returns>The ISiloBuilder</returns>
+        public static ISiloBuilder AddOrleansApplicationInsights(this ISiloBuilder services, Action<TelemetryOptions> options)
         {
             var telemetryOptions = new TelemetryOptions();
             options?.Invoke(telemetryOptions);
@@ -36,26 +37,26 @@ namespace Orleans.Telemetry.ApplicationInsights
         /// <param name="services">The IServiceCollection</param>
         /// <param name="options">The Options instance used to configure with</param>
         /// <returns>The IServiceCollection</returns>
-        private static IServiceCollection AddOrleansApplicationInsights(IServiceCollection services, TelemetryOptions options)
+        private static ISiloBuilder AddOrleansApplicationInsights(ISiloBuilder siloBuilder, TelemetryOptions options)
         {
-            services.AddSingleton(options.TelemetryEnabledGrainTypeContainer);
+            siloBuilder.Services.AddSingleton(options.TelemetryEnabledGrainTypeContainer);
 
             if (options.EnableGrainMessagingTelemetry)
-                services.AddSingleton<IIncomingGrainCallFilter, IncomingCallTelemetryLogger>()
+                siloBuilder.Services.AddSingleton<IIncomingGrainCallFilter, IncomingCallTelemetryLogger>()
                         .AddSingleton<IOutgoingGrainCallFilter, OutgoingCallTelemetryLogger>()
                         .AddSingleton<IOutgoingGrainCallFilter, TelemetryCorrelationProvider>();
 
             if (options.EnableSiloLifecycleTelemetry)
-                services.AddSingleton<ILifecycleParticipant<ISiloLifecycle>, SiloLifecycleTelemetryLogger>();
+                siloBuilder.Services.AddSingleton<ILifecycleParticipant<ISiloLifecycle>, SiloLifecycleTelemetryLogger>();
 
             if (options.EnableGrainLifecycleTelemetry)
-                services.AddTransient(sp =>
+                siloBuilder.Services.AddTransient(sp =>
                 GrainLifecycleTelemetryLogger.Create(
-                    sp.GetRequiredService<IGrainContextAccessor>(),
+                    sp.GetRequiredService<IGrainContext>(),
                     sp.GetRequiredService<TelemetryClient>()
                 ));
 
-            return services;
+            return siloBuilder;
         }
     }
 }

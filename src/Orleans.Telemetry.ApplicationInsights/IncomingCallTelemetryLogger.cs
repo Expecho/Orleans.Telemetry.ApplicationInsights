@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.Extensions.Options;
+using Orleans.Configuration;
 using Orleans.Runtime;
 
 namespace Orleans.Telemetry.ApplicationInsights
@@ -9,13 +11,13 @@ namespace Orleans.Telemetry.ApplicationInsights
     public class IncomingCallTelemetryLogger : IIncomingGrainCallFilter
     {
         private readonly TelemetryClient _telemetryClient;
-        private readonly ILocalSiloDetails _localSiloDetails;
+        private readonly IOptions<ClusterOptions> _clusterOptions;
         private readonly ITelemetryEnabledGrainTypeContainer _grainTypeContainer;
 
-        public IncomingCallTelemetryLogger(TelemetryClient telemetryClient, ILocalSiloDetails localSiloDetails, ITelemetryEnabledGrainTypeContainer grainTypeContainer)
+        public IncomingCallTelemetryLogger(TelemetryClient telemetryClient, IOptions<ClusterOptions> clusterOptions, ITelemetryEnabledGrainTypeContainer grainTypeContainer)
         {
             _telemetryClient = telemetryClient;
-            _localSiloDetails = localSiloDetails;
+            _clusterOptions = clusterOptions;
             _grainTypeContainer = grainTypeContainer;
         }
 
@@ -39,7 +41,7 @@ namespace Orleans.Telemetry.ApplicationInsights
                 operation.Telemetry.Context.Operation.Id = operationId;
                 operation.Telemetry.Success = true;
                 operation.Telemetry.Type = "Orleans Actor MessageIn";
-                operation.Telemetry.Target = $"{_localSiloDetails.ClusterId}.{_localSiloDetails.SiloAddress}.{grainId}";
+                operation.Telemetry.Target = $"{_clusterOptions.Value.ClusterId}.{(context.Grain as Grain)?.RuntimeIdentity}.{grainId}";
                 operation.Telemetry.Properties["grainId"] = grainId.ToString();
                 operation.Telemetry.Properties["grainType"] = typeName;
 

@@ -34,9 +34,9 @@ siloBuilder
         ...
         services
             .AddApplicationInsightsTelemetryWorkerService()
-            .AddOrleansApplicationInsights();
         ...
     }
+    .AddOrleansApplicationInsights();
 ```
 
 `AddOrleansApplicationInsights` can also be called with an overload to configure the options of the telemetry provider using `TelemetryOptions`.

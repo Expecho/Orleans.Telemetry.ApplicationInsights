@@ -9,18 +9,18 @@ namespace Orleans.Telemetry.ApplicationInsights
     public class GrainLifecycleTelemetryLogger : ILifecycleParticipant<IGrainLifecycle>
     {
         private readonly TelemetryClient _telemetryClient;
-        private readonly IGrainContextAccessor _context;
+        private readonly IGrainContext _context;
 
-        public GrainLifecycleTelemetryLogger(TelemetryClient telemetryClient, IGrainContextAccessor context)
+        public GrainLifecycleTelemetryLogger(TelemetryClient telemetryClient, IGrainContext context)
         {
             _telemetryClient = telemetryClient;
             _context = context;
         }
 
-        public static GrainLifecycleTelemetryLogger Create(IGrainContextAccessor context, TelemetryClient telemetryClient)
+        public static GrainLifecycleTelemetryLogger Create(IGrainContext context, TelemetryClient telemetryClient)
         {
             var component = new GrainLifecycleTelemetryLogger(telemetryClient, context);
-            component.Participate(context.GrainContext.ObservableLifecycle);
+            component.Participate(context.ObservableLifecycle);
             return component;
         }
 
@@ -40,16 +40,16 @@ namespace Orleans.Telemetry.ApplicationInsights
         private void SetCorrelationDataOnActivation()
         {
             Activity.Current?
-                .AddBaggage("grainId", _context.GrainContext.GrainId.ToString())
-                .AddBaggage("grainType", _context.GrainContext.GrainInstance.GetType().FullName);
+                .AddBaggage("grainId", _context.GrainId.ToString())
+                .AddBaggage("grainType", _context.GrainInstance.GetType().FullName);
         }
 
         private Task TrackLifecycleEvent(string stage)
         {
             _telemetryClient.TrackEvent(stage, new Dictionary<string, string>
             {
-                {"grainId", _context.GrainContext.GrainId.ToString()},
-                {"grainType", _context.GrainContext.GrainInstance.GetType().FullName}
+                {"grainId", _context.GrainId.ToString()},
+                {"grainType", _context.GrainInstance.GetType().FullName}
             });
 
             return Task.CompletedTask;
