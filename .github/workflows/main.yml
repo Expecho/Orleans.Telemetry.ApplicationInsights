@@ -21,6 +21,8 @@ jobs:
       run: dotnet restore src/Orleans.Telemetry.ApplicationInsights/Orleans.Telemetry.ApplicationInsights.csproj
     - name: Build
       run: dotnet build src/Orleans.Telemetry.ApplicationInsights/Orleans.Telemetry.ApplicationInsights.csproj --configuration Release
+    - name: Test with the dotnet CLI
+      run: dotnet test
     - name: Pack with dotnet
       run: dotnet pack src/Orleans.Telemetry.ApplicationInsights/Orleans.Telemetry.ApplicationInsights.csproj --output nuget --configuration Release      
     - name: Upload Assembly Build Artifact
