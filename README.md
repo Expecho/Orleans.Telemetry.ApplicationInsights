@@ -1,6 +1,6 @@
 # Orleans.Telemetry.ApplicationInsights
 
-Send grain and silo telemetry to [Azure Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview). Orleans is already able to log metrics and traces to Application Insights but it does not support writing Application Insights specific telemetry types like custom events and dependencies out-of-the-box. This package addresses that.
+Send grain and silo telemetry to [Azure Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview). 
 
 ## NuGet
 
