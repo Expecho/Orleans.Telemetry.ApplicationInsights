@@ -1,9 +1,12 @@
 using System.Reflection;
 using System.Threading.Tasks;
+using Azure.Monitor.OpenTelemetry.Exporter;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Orleans.Hosting;
 using Orleans.TestingHost;
 using Xunit;
@@ -39,34 +42,49 @@ namespace Orleans.Telemetry.ApplicationInsights.Tests.Helpers
 
     public class TestSiloConfigurations : ISiloConfigurator
     {
+        [System.Obsolete]
         public void Configure(ISiloBuilder siloBuilder)
         {
             siloBuilder
                 .ConfigureServices(services =>
                 {
                     services.AddSingleton<ITelemetryChannel, InMemoryChannel>()
-                        .AddApplicationInsightsTelemetryWorkerService(options =>
+                        //.AddApplicationInsightsTelemetryWorkerService(options =>
+                        //{
+                        //    options.DeveloperMode = true;
+                        //    options.EnableAdaptiveSampling = false;
+                        //    options.EnableEventCounterCollectionModule = false;
+                        //    options.EnableHeartbeat = false;
+                        //    options.EnablePerformanceCounterCollectionModule = false;
+                        //    options.EnableQuickPulseMetricStream = false;
+                        //})
+                        .AddSingleton<ITelemetryInitializer, UnitTestTelemetryCollector>()
+                        .AddOpenTelemetryTracing(tracerProviderBuilder =>
                         {
-                            options.DeveloperMode = true;
-                            options.EnableAdaptiveSampling = false;
-                            options.EnableEventCounterCollectionModule = false;
-                            options.EnableHeartbeat = false;
-                            options.EnablePerformanceCounterCollectionModule = false;
-                            options.EnableQuickPulseMetricStream = false;
-                        })
-                        .AddSingleton<ITelemetryInitializer, UnitTestTelemetryCollector>();
+                            tracerProviderBuilder
+                                .AddConsoleExporter()
+                                .AddAzureMonitorTraceExporter(options =>
+                                {
+                                    options.ConnectionString = "InstrumentationKey=;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/";
+                                })
+                                .AddSource("Microsoft.Orleans.Application")
+                                .AddSource("Microsoft.Orleans.Runtime")
+                                .SetResourceBuilder(ResourceBuilder.CreateDefault()
+                                    .AddService(serviceName: "Orleans.Telemetry.ApplicationInsights"));
+                        });
                 })
-                .AddOrleansApplicationInsights(options =>
-                {
-                    options.TelemetryEnabledGrainTypeContainer =
-                        new DefaultTelemetryEnabledGrainTypeContainer(Assembly.GetExecutingAssembly());
-                })
+                //.AddOrleansApplicationInsights(options =>
+                //{
+                //    options.TelemetryEnabledGrainTypeContainer =
+                //        new DefaultTelemetryEnabledGrainTypeContainer(Assembly.GetExecutingAssembly());
+                //})
                 .ConfigureLogging(builder =>
                 {
                     builder
                         .AddDebug()
                         .AddConsole();
                 })
+                .AddActivityPropagation()
                 .UseInMemoryReminderService();
         }
     }
